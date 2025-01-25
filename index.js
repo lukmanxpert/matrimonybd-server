@@ -1,9 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const jwt = require("jsonwebtoken");
 const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 9000;
+
+// middleware
 app.use(cors());
 app.use(express.json());
 
@@ -25,6 +28,40 @@ async function run() {
     // initial api
     app.get("/", (req, res) => {
       res.send("hello world!!");
+    });
+
+    // jtw token generate
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.secret_key, {
+        expiresIn: "1h",
+      });
+      res.send(token);
+    });
+
+    // middleware
+    // verify token
+    const verifyToken = (req, res, next) => {
+      const data = req.headers.authorization;
+      const token = data && data.split(" ")[1];
+      if (!token) {
+        return res.status(401).send(["unauthorize access"])
+      }
+      jwt.verify(token, process.env.secret_key, function (err, decoded) {
+        if (err) {
+          return res.status(401).send("unauthorize access");
+        }
+        req.user = decoded;
+        next();
+      });
+    };
+
+    // isAdmin
+    app.get("/isAdmin/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const filter = { email };
+      const result = await usersCollection.findOne(filter);
+      res.send(result.role);
     });
 
     // post user api
