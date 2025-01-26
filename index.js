@@ -24,6 +24,7 @@ async function run() {
     await client.connect();
     const matrimonyBD = client.db("matrimonyBD");
     const usersCollection = matrimonyBD.collection("users");
+    const biodataCollection = matrimonyBD.collection("biodata's");
 
     // initial api
     app.get("/", (req, res) => {
@@ -45,7 +46,7 @@ async function run() {
       const data = req.headers.authorization;
       const token = data && data.split(" ")[1];
       if (!token) {
-        return res.status(401).send(["unauthorize access"])
+        return res.status(401).send(["unauthorize access"]);
       }
       jwt.verify(token, process.env.secret_key, function (err, decoded) {
         if (err) {
@@ -75,7 +76,25 @@ async function run() {
       const result = await usersCollection.insertOne(user);
       res.send(result);
     });
+    app.post("/biodata", verifyToken, async (req, res) => {
+      const data = req.body;
+      const filter = { email: data.email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: { ...data },
+      };
 
+      try {
+        const updatedResult = await biodataCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
+        res.send(updatedResult);
+      } catch (error) {
+        res.status(500).send({ error: error.message });
+      }
+    });
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
