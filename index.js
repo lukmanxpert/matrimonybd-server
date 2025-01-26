@@ -95,6 +95,12 @@ async function run() {
         res.status(500).send({ error: error.message });
       }
     });
+    app.get("/biodata/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await biodataCollection.findOne(query);
+      res.send(result);
+    });
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
