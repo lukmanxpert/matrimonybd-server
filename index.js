@@ -144,6 +144,28 @@ async function run() {
       res.send(result);
     });
 
+    // premium request
+    app.get("/premiumRequests", verifyToken, async (req, res) => {
+      const query = {
+        premiumStatus: "pending",
+      };
+      const result = await biodataCollection.find(query).toArray();
+      res.send(result);
+    });
+    // approved premium
+    app.post("/approvePremium/:id", verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        biodataId: parseInt(id),
+      };
+      const updateDoc = {
+        $set: {
+          premiumStatus: "premium",
+        },
+      };
+      const result = await biodataCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
