@@ -76,15 +76,38 @@ async function run() {
       const result = await usersCollection.insertOne(user);
       res.send(result);
     });
+
     app.post("/biodata", verifyToken, async (req, res) => {
       const data = req.body;
       const filter = { email: data.email };
       const options = { upsert: true };
-      const updateDoc = {
-        $set: { ...data },
-      };
 
       try {
+        const existingBiodata = await biodataCollection.findOne(filter);
+
+        let updateDoc;
+
+        if (existingBiodata) {
+          updateDoc = {
+            $set: { ...data, biodataId: existingBiodata.biodataId },
+          };
+        } else {
+          const lastBiodata = await biodataCollection.findOne(
+            {},
+            { sort: { biodataId: -1 } }
+          );
+
+          let newBiodataId = 1;
+
+          if (lastBiodata && typeof lastBiodata.biodataId === "number") {
+            newBiodataId = lastBiodata.biodataId + 1;
+          }
+
+          updateDoc = {
+            $set: { ...data, biodataId: newBiodataId },
+          };
+        }
+
         const updatedResult = await biodataCollection.updateOne(
           filter,
           updateDoc,
@@ -92,9 +115,11 @@ async function run() {
         );
         res.send(updatedResult);
       } catch (error) {
+        console.error("Error processing biodata:", error);
         res.status(500).send({ error: error.message });
       }
     });
+
     app.get("/biodata/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
