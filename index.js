@@ -187,6 +187,19 @@ async function run() {
       const result = await usersCollection.updateOne(query, updateDoc);
       res.send(result);
     });
+
+    // make premium
+    app.put("/users/make-premium/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const updateDoc = {
+        $set: {
+          isPremium: "premium",
+        },
+      };
+      const result = await usersCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
