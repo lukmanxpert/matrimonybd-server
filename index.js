@@ -126,6 +126,24 @@ async function run() {
       const result = await biodataCollection.findOne(query);
       res.send(result);
     });
+
+    // biodata premium request
+    app.post("/biodata/premium-request", verifyToken, async (req, res) => {
+      const data = req.body;
+      const email = data.email;
+      if (data.email !== req.user.email) {
+        res.status(401).send("unauthorize access");
+      }
+      const filter = { email };
+      const updateDoc = {
+        $set: {
+          premiumStatus: "pending",
+        },
+      };
+      const result = await biodataCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
