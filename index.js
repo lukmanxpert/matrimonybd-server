@@ -261,6 +261,13 @@ async function run() {
       const result = await favouritesCollection.deleteOne(query);
       res.send(result);
     });
+
+    // get premiumMembers
+    app.get("/premiumMembers", async (req, res) => {
+      const query = { premiumStatus: "premium" };
+      const result = await biodataCollection.find(query).limit(6).toArray();
+      res.send(result);
+    });
   } finally {
     //   await client.close();
   }
