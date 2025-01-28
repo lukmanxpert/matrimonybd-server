@@ -21,7 +21,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
     const matrimonyBD = client.db("matrimonyBD");
     const usersCollection = matrimonyBD.collection("users");
     const biodataCollection = matrimonyBD.collection("biodata's");
@@ -226,10 +226,6 @@ async function run() {
       const result = await biodataCollection.find().toArray();
       res.send(result);
     });
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
     // get specific biodata
     app.get("/biodatas/:biodataId", verifyToken, async (req, res) => {
       const biodataId = parseInt(req.params.biodataId);
@@ -268,6 +264,16 @@ async function run() {
       const result = await biodataCollection.find(query).limit(6).toArray();
       res.send(result);
     });
+
+    // total biodata
+    app.get("/totalBiodata", verifyToken, async (req, res) => {
+      const result = await biodataCollection.find().toArray();
+      res.send(result);
+    });
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     //   await client.close();
   }
