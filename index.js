@@ -62,7 +62,7 @@ async function run() {
       const email = req.params.email;
       const filter = { email };
       const result = await usersCollection.findOne(filter);
-      res.send(result.role);
+      res.send(result?.role);
     });
 
     // post user api
@@ -220,10 +220,22 @@ async function run() {
       }
     });
 
+    // get all biodatas
+    app.get("/biodatas", async (req, res) => {
+      const result = await biodataCollection.find().toArray();
+      res.send(result);
+    });
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+    // get specific biodata
+    app.get("/biodatas/:biodataId", verifyToken, async (req, res) => {
+      const biodataId = parseInt(req.params.biodataId);
+      const query = { biodataId };
+      const result = await biodataCollection.findOne(query);
+      res.send(result);
+    });
   } finally {
     //   await client.close();
   }
