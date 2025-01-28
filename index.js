@@ -25,6 +25,7 @@ async function run() {
     const matrimonyBD = client.db("matrimonyBD");
     const usersCollection = matrimonyBD.collection("users");
     const biodataCollection = matrimonyBD.collection("biodata's");
+    const favouritesCollection = matrimonyBD.collection("favourites");
 
     // initial api
     app.get("/", (req, res) => {
@@ -234,6 +235,13 @@ async function run() {
       const biodataId = parseInt(req.params.biodataId);
       const query = { biodataId };
       const result = await biodataCollection.findOne(query);
+      res.send(result);
+    });
+
+    // add to favourite post
+    app.post("/addToFavourites", verifyToken, async (req, res) => {
+      const data = req.body;
+      const result = await favouritesCollection.insertOne(data);
       res.send(result);
     });
   } finally {
