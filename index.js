@@ -200,6 +200,26 @@ async function run() {
       const result = await usersCollection.updateOne(query, updateDoc);
       res.send(result);
     });
+
+    // is premium api
+    app.get("/users/isPremium/:email", verifyToken, async (req, res) => {
+      try {
+        const email = req.params.email;
+        const query = { email };
+        const result = await usersCollection.findOne(query);
+
+        if (!result) {
+          return res.send(false);
+        }
+
+        const isPremium = result.isPremium === "premium";
+        res.send(isPremium);
+      } catch (error) {
+        console.error("Error fetching premium status:", error);
+        res.status(500).send({ error: error.message });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
