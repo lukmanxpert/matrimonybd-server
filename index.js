@@ -244,6 +244,23 @@ async function run() {
       const result = await favouritesCollection.insertOne(data);
       res.send(result);
     });
+
+    // get favourites data
+    app.get("/favourites/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const query = {
+        authEmail: email,
+      };
+      const result = await favouritesCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // delete favourites
+    app.post("/deleteFavourites", verifyToken, async (req, res) => {
+      const query = req.body;
+      const result = await favouritesCollection.deleteOne(query);
+      res.send(result);
+    });
   } finally {
     //   await client.close();
   }
