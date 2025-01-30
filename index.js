@@ -59,7 +59,7 @@ async function run() {
     };
 
     // isAdmin
-    app.get("/isAdmin/:email", verifyToken, async (req, res) => {
+    app.get("/isAdmin/:email", async (req, res) => {
       const email = req.params.email;
       const filter = { email };
       const result = await usersCollection.findOne(filter);
