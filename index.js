@@ -1,14 +1,21 @@
-const express = require("express");
-const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const jwt = require("jsonwebtoken");
+import express from "express";
+import cors from "cors";
+import biodataRouter from "./routes/biodata.route.js";
+import { MongoClient, ServerApiVersion } from "mongodb";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 const app = express();
-require("dotenv").config();
+dotenv.config();
 const port = process.env.PORT || 9000;
+
+let usersCollection;
+let biodataCollection;
+let favouritesCollection;
 
 // middleware
 app.use(cors());
 app.use(express.json());
+app.use("/api/biodata", biodataRouter);
 
 const uri = `mongodb+srv://${process.env.mongo_user}:${process.env.mongo_pass}@cluster0.l73rt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 const client = new MongoClient(uri, {
@@ -23,9 +30,9 @@ async function run() {
   try {
     // await client.connect();
     const matrimonyBD = client.db("matrimonyBD");
-    const usersCollection = matrimonyBD.collection("users");
-    const biodataCollection = matrimonyBD.collection("biodata's");
-    const favouritesCollection = matrimonyBD.collection("favourites");
+    usersCollection = matrimonyBD.collection("users");
+    biodataCollection = matrimonyBD.collection("biodata's");
+    favouritesCollection = matrimonyBD.collection("favourites");
 
     // initial api
     app.get("/", (req, res) => {
