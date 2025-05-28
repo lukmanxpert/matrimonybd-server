@@ -8,12 +8,19 @@ const app = express();
 dotenv.config();
 const port = process.env.PORT || 9000;
 
-let usersCollection;
-let biodataCollection;
-let favouritesCollection;
+export let usersCollection;
+export let biodataCollection;
+export let favouritesCollection;
 
 // middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use("/api/biodata", biodataRouter);
 
