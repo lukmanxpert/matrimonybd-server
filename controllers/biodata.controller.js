@@ -23,7 +23,7 @@ export const getSimilarBiodataController = async (req, res) => {
     if (excludedId) {
       query._id = { $ne: new ObjectId(excludedId) };
     }
-    const biodata = await biodataCollection.find(query).toArray();
+    const biodata = await biodataCollection.find(query).limit(3).toArray();
     if (biodata.length === 0) {
       return res.status(404).json({
         message: "No biodata found for the specified type",

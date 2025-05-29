@@ -2,10 +2,13 @@ import express from "express";
 import cors from "cors";
 import biodataRouter from "./routes/biodata.route.js";
 import { MongoClient, ServerApiVersion } from "mongodb";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-const app = express();
+import userRouter from "./routes/user.route.js";
+import verifyToken from "./middleware/verifyToken.js";
+import jwt from "jsonwebtoken";
 dotenv.config();
+
+const app = express();
 const port = process.env.PORT || 9000;
 
 export let usersCollection;
@@ -13,6 +16,7 @@ export let biodataCollection;
 export let favouritesCollection;
 
 // middleware
+app.use(express.json());
 app.use(
   cors({
     origin: "*",
@@ -21,8 +25,8 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
 app.use("/api/biodata", biodataRouter);
+app.use("/api/users", userRouter);
 
 const uri = `mongodb+srv://${process.env.mongo_user}:${process.env.mongo_pass}@cluster0.l73rt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 const client = new MongoClient(uri, {
@@ -35,7 +39,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // await client.connect();
+    await client.connect();
     const matrimonyBD = client.db("matrimonyBD");
     usersCollection = matrimonyBD.collection("users");
     biodataCollection = matrimonyBD.collection("biodata's");
@@ -54,23 +58,6 @@ async function run() {
       });
       res.send(token);
     });
-
-    // middleware
-    // verify token
-    const verifyToken = (req, res, next) => {
-      const data = req.headers.authorization;
-      const token = data && data.split(" ")[1];
-      if (!token) {
-        return res.status(401).send(["unauthorize access"]);
-      }
-      jwt.verify(token, process.env.secret_key, function (err, decoded) {
-        if (err) {
-          return res.status(401).send("unauthorize access");
-        }
-        req.user = decoded;
-        next();
-      });
-    };
 
     // isAdmin
     app.get("/isAdmin/:email", async (req, res) => {
@@ -288,12 +275,11 @@ async function run() {
     // console.log(
     //   "Pinged your deployment. You successfully connected to MongoDB!"
     // );
+    app.listen(port, () => {
+      console.log(`app is listening at port: ${port}`);
+    });
   } finally {
     //   await client.close();
   }
 }
 run().catch(console.dir);
-
-app.listen(port, () => {
-  console.log(`app is listening at port: ${port}`);
-});
