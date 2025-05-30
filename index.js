@@ -52,8 +52,8 @@ async function run() {
 
     // jtw token generate
     app.post("/jwt", async (req, res) => {
-      const user = req.body;
-      const token = jwt.sign(user, process.env.secret_key, {
+      const { userEmail } = req.body;
+      const token = jwt.sign({ userEmail }, process.env.secret_key, {
         expiresIn: "1h",
       });
       res.send(token);
@@ -275,11 +275,11 @@ async function run() {
     // console.log(
     //   "Pinged your deployment. You successfully connected to MongoDB!"
     // );
-    app.listen(port, () => {
-      console.log(`app is listening at port: ${port}`);
-    });
   } finally {
     //   await client.close();
   }
 }
 run().catch(console.dir);
+app.listen(port, () => {
+  console.log(`app is listening at port: ${port}`);
+});
