@@ -235,30 +235,6 @@ async function run() {
       res.send(result);
     });
 
-    // add to favourite post
-    app.post("/addToFavourites", verifyToken, async (req, res) => {
-      const data = req.body;
-      const result = await favouritesCollection.insertOne(data);
-      res.send(result);
-    });
-
-    // get favourites data
-    app.get("/favourites/:email", verifyToken, async (req, res) => {
-      const email = req.params.email;
-      const query = {
-        authEmail: email,
-      };
-      const result = await favouritesCollection.find(query).toArray();
-      res.send(result);
-    });
-
-    // delete favourites
-    app.post("/deleteFavourites", verifyToken, async (req, res) => {
-      const query = req.body;
-      const result = await favouritesCollection.deleteOne(query);
-      res.send(result);
-    });
-
     // get premiumMembers
     app.get("/premiumMembers", async (req, res) => {
       const query = { premiumStatus: "premium" };
