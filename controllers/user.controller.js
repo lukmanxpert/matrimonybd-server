@@ -1,6 +1,5 @@
 import e from "express";
-import { usersCollection } from "../index.js";
-import { ObjectId } from "mongodb";
+import { usersCollection } from "../index.js"; 
 e.json();
 
 // add favourite biodata
