@@ -39,7 +39,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
     const matrimonyBD = client.db("matrimonyBD");
     usersCollection = matrimonyBD.collection("users");
     biodataCollection = matrimonyBD.collection("biodata's");
